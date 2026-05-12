@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Retirement Bridge Planner · RupeeStories</title>
+<meta name="description" content="Plan the bridge years before 59½. SEPP, Roth ladder, Rule of 55, ACA, healthcare. Free. No login. No data collected."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --navy:#1B2A4A; --navy-2:#243460; --navy-deep:#141f38;
+    --gold:#C9942A; --gold-2:#E8B84B; --gold-soft:rgba(201,148,42,.12); --gold-border:rgba(201,148,42,.32);
+    --cream:#F5F0E8; --cream-2:#EDE7DA; --paper:#FFFCF7; --white:#FFFFFF;
+    --ink:#1B2A4A; --ink-soft:#4A5568; --ink-faint:#8896AB;
+    --line:#E5DFD2; --line-soft:rgba(27,42,74,.08);
+    --green:#2D9E6B; --green-soft:#E6F4EC;
+    --red:#C0392B; --red-soft:#FBE9E7;
+    --amber:#B8860B; --amber-soft:#FFF6DC;
+    --blue:#1B5FA5; --blue-soft:#E6F0FB;
+    --shadow-sm:0 2px 10px rgba(27,42,74,.06);
+    --shadow-md:0 8px 28px rgba(27,42,74,.10);
+    --shadow-lg:0 20px 48px rgba(27,42,74,.14);
+    --r-sm:10px; --r-md:14px; --r-lg:18px; --r-xl:24px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'DM Sans',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+  .serif{font-family:'Playfair Display',Georgia,serif;letter-spacing:-.01em}
+
+  /* HEADER */
+  header{background:var(--navy);color:var(--white);padding:54px 22px 60px;position:relative;overflow:hidden}
+  header::before{content:'';position:absolute;top:-120px;right:-100px;width:460px;height:460px;border-radius:50%;
+    background:radial-gradient(circle,rgba(201,148,42,.18) 0%,transparent 65%);pointer-events:none}
+  header::after{content:'';position:absolute;bottom:-160px;left:-80px;width:360px;height:360px;border-radius:50%;
+    background:radial-gradient(circle,rgba(201,148,42,.08) 0%,transparent 70%);pointer-events:none}
+  .wrap{max-width:1280px;margin:0 auto;position:relative;z-index:1}
+  .eyebrow{color:var(--gold-2);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
+  h1{font-family:'Playfair Display',Georgia,serif;font-weight:600;font-size:clamp(30px,4.6vw,50px);letter-spacing:-.02em;line-height:1.06;margin:0 0 14px;color:#fff}
+  h1 em{color:var(--gold-2);font-style:italic;font-weight:600}
+  .sub{max-width:760px;color:#dad1c0;font-size:16px;margin:0;line-height:1.55}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .badge{border:1px solid rgba(232,184,75,.30);background:rgba(232,184,75,.08);color:#f0e5cc;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:500;letter-spacing:.02em}
+
+  /* MAIN GRID */
+  main{padding:26px 22px 80px}
+  .grid{display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);padding:20px}
+  .sticky{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;scrollbar-width:thin}
+  .sticky::-webkit-scrollbar{width:6px}.sticky::-webkit-scrollbar-thumb{background:var(--gold-border);border-radius:3px}
+
+  /* INPUTS */
+  .panel-title{font-family:'Playfair Display',Georgia,serif;font-size:21px;font-weight:600;color:var(--navy);margin:0 0 8px}
+  .panel-sub{font-size:12px;color:var(--ink-soft);margin-bottom:16px}
+  .section-h{font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.14em;font-weight:700;margin:22px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .section-h:first-of-type{margin-top:8px}
+  label{display:block;margin:11px 0 5px;font-size:12px;color:var(--ink-soft);font-weight:600}
+  label.inline{display:flex;align-items:center;gap:8px;margin:12px 0 6px;cursor:pointer;color:var(--ink);font-weight:500;font-size:13px}
+  input[type="number"],select{width:100%;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;font-size:14px;font-family:inherit;background:var(--white);color:var(--ink);transition:border-color .15s,box-shadow .15s}
+  input[type="number"]:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+  input[type="checkbox"]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  button{width:100%;margin-top:18px;border:0;background:var(--gold);color:var(--navy);padding:13px 14px;border-radius:var(--r-sm);font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;letter-spacing:.02em;transition:transform .1s,box-shadow .15s;box-shadow:0 4px 12px rgba(201,148,42,.25)}
+  button:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(201,148,42,.32)}
+  button:active{transform:translateY(0)}
+  button.secondary{background:var(--white);border:1px solid var(--line);color:var(--navy);box-shadow:none}
+  button.secondary:hover{background:var(--cream-2);box-shadow:none}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .mini{font-size:11px;color:var(--ink-faint);margin-top:10px;line-height:1.5}
+
+  /* SUMMARY METRICS */
+  .summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px}
+  .metric{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 18px 16px;position:relative;box-shadow:var(--shadow-sm);overflow:hidden}
+  .metric::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold)}
+  .metric.danger::before{background:var(--red)}
+  .metric.warn::before{background:var(--amber)}
+  .metric.ok::before{background:var(--green)}
+  .metric.blue::before{background:var(--blue)}
+  .metric .label{font-size:11px;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+  .metric .value{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:600;margin-top:6px;letter-spacing:-.02em;line-height:1.1}
+  .metric .hint{font-size:11px;color:var(--ink-faint);margin-top:4px}
+  .ok{color:var(--green)}.danger{color:var(--red)}.warn{color:var(--amber)}.blue{color:var(--blue)}.navy{color:var(--navy)}
+
+  /* NOTES */
+  .note{background:#fff8e8;border:1px solid #f1d77a;border-left:4px solid var(--gold);color:#5e4814;padding:14px 16px;border-radius:var(--r-sm);margin-bottom:18px;font-size:13.5px;line-height:1.55}
+  .note strong{color:var(--navy)}
+  .alert{background:var(--red-soft);border:1px solid #f5b7b1;border-left:4px solid var(--red);color:#6b1f17;padding:14px 16px;border-radius:var(--r-sm);margin-bottom:18px;font-size:13.5px;line-height:1.55}
+  .alert strong{color:var(--red)}
+
+  /* HEADLINE BANNER */
+  .headline{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);color:#fff;border-radius:var(--r-lg);padding:22px 24px;margin-bottom:20px;display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;box-shadow:var(--shadow-md);position:relative;overflow:hidden}
+  .headline::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(201,148,42,.15) 0%,transparent 70%);pointer-events:none}
+  .headline .eyebrow{margin-bottom:4px}
+  .headline h2{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:600;color:#fff;margin:0 0 6px;letter-spacing:-.01em;line-height:1.2}
+  .headline .pitch{color:#dad1c0;font-size:13.5px;max-width:560px}
+  .verdict{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:600;color:var(--gold-2);text-align:right;letter-spacing:-.02em}
+  .verdict.bad{color:#f5b7b1}
+  .verdict .lbl{display:block;font-family:'DM Sans',sans-serif;font-size:11px;color:#dad1c0;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+
+  /* TABS */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:0}
+  .tab{width:auto;margin:0;padding:9px 14px;background:transparent;border:0;color:var(--ink-soft);font-weight:600;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;border-radius:0;box-shadow:none;letter-spacing:0;transition:color .15s,border-color .15s}
+  .tab:hover{color:var(--navy);background:transparent;box-shadow:none;transform:none}
+  .tab.active{color:var(--navy);border-bottom-color:var(--gold);background:transparent}
+
+  /* TABLES */
+  .tableWrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r-md);background:var(--white);scrollbar-width:thin}
+  .tableWrap::-webkit-scrollbar{height:8px;width:8px}
+  .tableWrap::-webkit-scrollbar-thumb{background:var(--gold-border);border-radius:4px}
+  table{width:100%;border-collapse:collapse;min-width:1080px;font-size:12.5px;font-variant-numeric:tabular-nums}
+  th,td{padding:9px 11px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--white);z-index:1;font-weight:700;color:var(--navy)}
+  th{background:var(--navy);color:#fff;font-size:11px;font-weight:600;letter-spacing:.04em;position:sticky;top:0;z-index:2;text-transform:uppercase;border-bottom:0}
+  th:first-child{background:var(--navy);color:#fff;z-index:3}
+  tbody tr:hover td{background:#fbf7ed}
+  tbody tr.shortfall td{background:#fdf0ee}
+  tbody tr.shortfall:hover td{background:#fbe5e0}
+  tbody tr.shortfall td:first-child{background:#fdf0ee}
+  tbody tr.bridge td:first-child{border-left:3px solid var(--gold)}
+  tbody tr.medicare td:first-child{border-left:3px solid var(--blue)}
+  tbody tr.ssaccess td:first-child{border-left:3px solid var(--green)}
+
+  .pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.02em}
+  .pill.ok{background:var(--green-soft);color:#0e6a3b}
+  .pill.danger{background:var(--red-soft);color:var(--red)}
+  .pill.warn{background:var(--amber-soft);color:#7d5b00}
+  .pill.blue{background:var(--blue-soft);color:var(--blue)}
+  .pill.navy{background:var(--cream-2);color:var(--navy)}
+
+  /* CHART */
+  .chartBox{background:var(--white);border:1px solid var(--line);border-radius:var(--r-md);padding:18px;margin-bottom:18px}
+  .chartBox h3{font-family:'Playfair Display',Georgia,serif;font-size:17px;font-weight:600;color:var(--navy);margin:0 0 4px}
+  .chartBox .desc{font-size:12.5px;color:var(--ink-soft);margin-bottom:12px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-soft);margin-top:10px}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+  /* READ ME */
+  .readme{color:var(--ink);font-size:14px;line-height:1.65}
+  .readme h2{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:600;color:var(--navy);margin:8px 0 10px}
+  .readme h3{font-size:14px;color:var(--navy);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin:22px 0 8px}
+  .readme p{margin-bottom:12px}
+  .readme ul{margin-top:8px;padding-left:20px;margin-bottom:14px}
+  .readme li{margin-bottom:5px}
+
+  /* FOOTER */
+  footer{text-align:center;color:var(--ink-faint);font-size:12px;padding:30px 22px 12px;border-top:1px solid var(--line);margin-top:36px}
+  footer .brand{color:var(--navy);font-weight:600}
+
+  /* ACCESSIBILITY CARD */
+  .accessCard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px 24px;margin-bottom:20px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+  .accessCard::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-2),var(--gold))}
+  .accessHead{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:end;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .accessTitle{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:600;color:var(--navy);margin-top:6px;line-height:1.2;letter-spacing:-.01em}
+  .accessPitch{font-size:13.5px;color:var(--ink-soft);max-width:520px;line-height:1.55;justify-self:end;text-align:right}
+  .accessGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+  .accessTile{background:linear-gradient(180deg,var(--white) 0%,#fbf6ec 100%);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 14px 12px;position:relative;overflow:hidden}
+  .accessTile.locked{background:linear-gradient(180deg,#fdf2f0 0%,#fbe5e0 100%);border-color:#f5b7b1}
+  .accessTile.bridge{background:linear-gradient(180deg,#f0f9f3 0%,#dff0e7 100%);border-color:#a8d8b9}
+  .accessTile .tLabel{font-size:10.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.08em;line-height:1.3;min-height:28px}
+  .accessTile .tValue{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:600;color:var(--navy);margin-top:8px;letter-spacing:-.02em;line-height:1.05}
+  .accessTile.locked .tValue{color:var(--red)}
+  .accessTile.bridge .tValue{color:#0e6a3b}
+  .accessTile .tHint{font-size:10.5px;color:var(--ink-faint);margin-top:4px;line-height:1.4}
+  .accessFoot{font-size:13px;color:var(--ink-soft);margin-top:16px;line-height:1.55;padding:12px 14px;background:#fff8e8;border-radius:var(--r-sm);border-left:3px solid var(--gold)}
+  .accessFoot strong{color:var(--navy)}
+
+  @media(max-width:980px){
+    .accessGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .accessHead{grid-template-columns:1fr;gap:8px}
+    .accessPitch{justify-self:start;text-align:left}
+  }
+  @media(max-width:560px){
+    .accessGrid{grid-template-columns:1fr}
+  }
+
+  td.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum";min-width:48px}
+
+  /* RESPONSIVE */
+  @media(max-width:980px){
+    .grid{grid-template-columns:1fr}
+    .sticky{position:static;max-height:none}
+    .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .headline{grid-template-columns:1fr;text-align:left}
+    .verdict{text-align:left;font-size:26px}
+  }
+  @media(max-width:560px){
+    header{padding:38px 18px 44px}
+    main{padding:18px 14px 60px}
+    .summary{grid-template-columns:1fr}
+    .row2,.actions{grid-template-columns:1fr}
+    .metric .value{font-size:23px}
+    .chartBox{overflow-x:auto}
+    #chart{min-width:640px;height:240px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">RupeeStories · Bridge Planning</div>
+    <h1>Retirement before 59½ is a <em>cash-flow sequencing</em> problem</h1>
+    <p class="sub">Most retirement calculators ask whether your net worth lasts. This one asks whether you can actually access enough spendable money during the bridge years, before normal retirement access, pensions, Medicare, and Social Security fully turn on.</p>
+    <div class="badges">
+      <span class="badge">No login</span>
+      <span class="badge">No data collected</span>
+      <span class="badge">Educational prototype</span>
+      <span class="badge">SEPP · Roth ladder · Rule of 55</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="grid">
+
+  <!-- INPUT PANEL -->
+  <section class="card sticky">
+    <h2 class="panel-title">Your plan</h2>
+    <p class="panel-sub">All values are in today's dollars unless noted.</p>
+
+    <div class="section-h">Age and spending</div>
+    <div class="row2">
+      <div><label>Current age</label><input id="age" type="number" value="46"></div>
+      <div><label>Retirement age</label><input id="retireAge" type="number" value="50"></div>
+    </div>
+    <div class="row2">
+      <div><label>Spending today ($/yr)</label><input id="spend" type="number" value="75000"></div>
+      <div><label>Inflation %</label><input id="inflation" type="number" value="2.8" step="0.1"></div>
+    </div>
+    <div class="row2">
+      <div><label>Healthcare 50–65 ($/yr)</label><input id="healthcareBridge" type="number" value="24000"></div>
+      <div><label>Healthcare 65+ ($/yr)</label><input id="healthcareLater" type="number" value="9000"></div>
+    </div>
+    <div class="row2">
+      <div><label>Healthcare inflation %</label><input id="healthInflation" type="number" value="5.0" step="0.1"></div>
+      <div><label></label><div style="font-size:11px;color:var(--ink-faint);padding-top:8px">Healthcare typically inflates 4–6%/yr.</div></div>
+    </div>
+
+    <div class="section-h">Taxable assets</div>
+    <div class="row2">
+      <div><label>Cash / money market</label><input id="cash" type="number" value="105000"></div>
+      <div><label>Bonds / reserves</label><input id="taxableBasis" type="number" value="220000"></div>
+    </div>
+    <div class="row2">
+      <div><label>Taxable gains (stock)</label><input id="taxableGains" type="number" value="80000"></div>
+      <div><label>529 (education)</label><input id="college" type="number" value="242000"></div>
+    </div>
+    <label class="inline"><input id="include529" type="checkbox"> Count 529 as emergency fallback</label>
+
+    <div class="section-h">Retirement accounts</div>
+    <div class="row2">
+      <div><label>Current 401(k)</label><input id="current401k" type="number" value="900000"></div>
+      <div><label>Old 401(k)s</label><input id="old401k" type="number" value="300000"></div>
+    </div>
+    <div class="row2">
+      <div><label>Traditional IRA</label><input id="tradIRA" type="number" value="300000"></div>
+      <div><label>HSA</label><input id="hsa" type="number" value="109000"></div>
+    </div>
+    <div class="row2">
+      <div><label>Roth basis (contrib.)</label><input id="rothBasis" type="number" value="90000"></div>
+      <div><label>Roth earnings</label><input id="rothGrowth" type="number" value="210000"></div>
+    </div>
+
+    <div class="section-h">Bridge strategy</div>
+    <div class="row2">
+      <div><label>Primary strategy</label><select id="strategy">
+        <option value="sepp">72(t) + Roth ladder</option>
+        <option value="rule55">Rule of 55</option>
+        <option value="taxableOnly">Taxable first</option>
+      </select></div>
+      <div><label>Conversion taxes paid from</label><select id="taxSource">
+        <option value="taxable">Taxable / cash</option>
+        <option value="withheld">Withheld from conversion</option>
+      </select></div>
+    </div>
+    <div class="row2">
+      <div><label>72(t) source account</label><select id="seppSource">
+        <option value="old401k">Old 401(k)</option>
+        <option value="tradIRA">Traditional IRA</option>
+      </select></div>
+      <div><label>Roth conversion source</label><select id="convSource">
+        <option value="ira">IRA only</option>
+        <option value="iraOld">IRA + old 401(k)</option>
+        <option value="all">All traditional (incl. current)</option>
+      </select></div>
+    </div>
+    <div class="row2">
+      <div><label>72(t) gross / yr</label><input id="seppGross" type="number" value="36000"></div>
+      <div><label>72(t) tax rate %</label><input id="seppTaxRate" type="number" value="16.7" step="0.1"></div>
+    </div>
+    <div class="row2">
+      <div><label>Roth conv. gross / yr</label><input id="convGross" type="number" value="60000"></div>
+      <div><label>Conv. tax rate %</label><input id="convTaxRate" type="number" value="16.7" step="0.1"></div>
+    </div>
+    <div class="row2">
+      <div><label>Convert from age</label><input id="convStart" type="number" value="50"></div>
+      <div><label>Convert through age</label><input id="convEnd" type="number" value="54"></div>
+    </div>
+    <div class="row2">
+      <div><label>HSA qualified spend / yr</label><input id="hsaQualified" type="number" value="5000"></div>
+      <div><label>Cap gains rate %</label><input id="capGainsRate" type="number" value="15" step="0.1"></div>
+    </div>
+
+    <div class="section-h">Income sources</div>
+    <div class="row2">
+      <div><label>Spouse 1 pension age</label><input id="husPensionAge" type="number" value="62"></div>
+      <div><label>Spouse 1 pension / yr</label><input id="husPension" type="number" value="30000"></div>
+    </div>
+    <div class="row2">
+      <div><label>Spouse 2 pension age</label><input id="wifePensionAge" type="number" value="65"></div>
+      <div><label>Spouse 2 pension / yr</label><input id="wifePension" type="number" value="12636"></div>
+    </div>
+    <div class="row2">
+      <div><label>SS start age</label><input id="ssAge" type="number" value="70"></div>
+      <div><label>Combined SS / yr</label><input id="ssAnnual" type="number" value="106428"></div>
+    </div>
+
+    <div class="section-h">Returns and stress</div>
+    <div class="row2">
+      <div><label>Bond/cash return %</label><input id="bondReturn" type="number" value="3.5" step="0.1"></div>
+      <div><label>Stock return %</label><input id="stockReturn" type="number" value="6.0" step="0.1"></div>
+    </div>
+    <div class="row2">
+      <div><label>Stock allocation %</label><input id="stockAlloc" type="number" value="60" step="1"></div>
+      <div><label>Crash pattern</label><select id="crashPattern">
+        <option value="none">None</option>
+        <option value="year1">Crash in year 1</option>
+        <option value="year3">Crash in year 3</option>
+        <option value="threeYear">3-year bear market</option>
+        <option value="lostDecade">Lost decade</option>
+      </select></div>
+    </div>
+    <div class="row2">
+      <div><label>Crash severity %</label><input id="crashPct" type="number" value="25" step="1"></div>
+      <div><label>Inflation spike</label><select id="inflationSpike">
+        <option value="0">Off</option>
+        <option value="1">First 5 yrs +2%</option>
+      </select></div>
+    </div>
+
+    <div class="actions">
+      <button onclick="runCalc()">Run plan</button>
+      <button class="secondary" onclick="exportCSV()">Export CSV</button>
+    </div>
+    <div class="mini">Simplified annual math. Not an IRS rules engine, plan-document checker, or tax software.</div>
+  </section>
+
+  <!-- RESULTS -->
+  <section>
+
+    <div class="headline" id="headlineBanner">
+      <div>
+        <div class="eyebrow">Plan signal</div>
+        <h2 id="headlineTitle">Run your plan to see results</h2>
+        <div class="pitch" id="headlinePitch">Enter your assumptions on the left, then press <strong>Run plan</strong>.</div>
+      </div>
+      <div class="verdict" id="headlineVerdict">— <span class="lbl">verdict</span></div>
+    </div>
+
+    <div class="accessCard" id="accessCard">
+      <div class="accessHead">
+        <div>
+          <div class="eyebrow navy">Accessibility breakdown</div>
+          <div class="accessTitle">Why "rich on paper" is not the same as "ready to retire"</div>
+        </div>
+        <div class="accessPitch" id="accessPitch">Most early retirees anchor on total net worth. The bridge years care about what you can actually spend without triggering a 10% penalty.</div>
+      </div>
+      <div class="accessGrid" id="accessGrid"></div>
+      <div class="accessFoot" id="accessFoot"></div>
+    </div>
+
+    <div class="note">
+      <strong>Model limitation:</strong> This is a planning illustration, not a rules engine. It does not validate exact SEPP payment methods, plan-specific Rule of 55 terms, ACA subsidy cliffs, IRMAA, state taxes, RMDs, pension survivorship, or exact Roth ordering rules. Confirm specifics with a CPA or fiduciary planner before acting.
+    </div>
+
+    <div class="summary" id="summary"></div>
+
+    <div class="chartBox">
+      <h3>Liquid runway over time</h3>
+      <div class="desc">Each bar shows years of spending sitting in cash, bonds, and taxable gains at start of year. Watch for bars below 2 years — that's when bad timing forces panic decisions.</div>
+      <svg id="chart" viewBox="0 0 1000 280" width="100%" height="280" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="legend">
+        <span><i style="background:var(--gold)"></i>Liquid runway (years)</span>
+        <span><i style="background:var(--red)"></i>Below 2 yr — fragile</span>
+        <span><i style="background:var(--blue)"></i>SS / pension milestone</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="panel-title" style="margin-bottom:12px">Retirement phases</div>
+      <div class="tableWrap"><table id="phaseTable"></table></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('plan',this)">Year-by-year</button>
+        <button class="tab" onclick="showTab('timeline',this)">Freedom timeline</button>
+        <button class="tab" onclick="showTab('roth',this)">Roth access</button>
+        <button class="tab" onclick="showTab('compare',this)">Scenarios</button>
+        <button class="tab" onclick="showTab('warnings',this)">Warnings</button>
+        <button class="tab" onclick="showTab('readme',this)">Read me</button>
+      </div>
+      <div id="planTab"><div class="tableWrap"><table id="planTable"></table></div></div>
+      <div id="timelineTab" style="display:none"><div class="tableWrap"><table id="timelineTable"></table></div></div>
+      <div id="rothTab" style="display:none"><div class="tableWrap"><table id="rothTable"></table></div></div>
+      <div id="compareTab" style="display:none"><div class="tableWrap"><table id="compareTable"></table></div></div>
+      <div id="warningsTab" style="display:none"><div class="tableWrap"><table id="warningTable"></table></div></div>
+      <div id="readmeTab" style="display:none">
+        <div class="readme">
+          <h2>What this planner is built to show</h2>
+          <p>Most retirement calculators ask one question: does the money last to age 95? They model net worth on the back of average returns, fixed withdrawal rates, and a single tax assumption, then return a green checkmark or a red warning.</p>
+          <p>This planner asks a different question. Can you actually <em>access</em> enough spendable cash during the bridge years between retirement and age 59½, when most of your money sits behind a 10% early-withdrawal penalty, when Social Security and Medicare are a decade away, and when one bad sequence of market years can permanently break the plan?</p>
+
+          <h3>What the model tracks separately</h3>
+          <ul>
+            <li><strong>Account access rules.</strong> Current 401(k), old 401(k)s, traditional IRA, Roth contributions, Roth conversion vintages, Roth earnings, HSA, taxable basis, taxable gains, and the 529 — each handled with its own withdrawal logic.</li>
+            <li><strong>Rule of 55.</strong> Only the current employer 401(k) is treated as Rule-of-55 accessible, and only if you separate at 55+. Old 401(k)s and IRAs are not eligible.</li>
+            <li><strong>Roth five-year vintages.</strong> Conversions create vintages tracked year by year. Each must season for five tax years before the principal can be withdrawn penalty-free.</li>
+            <li><strong>Healthcare separately.</strong> Pre-Medicare insurance is modeled as a distinct line. For a family it can easily run $20–30K/year, and lumping it into general spending hides the real bridge stress.</li>
+            <li><strong>Bridge stress signal.</strong> Looks at liquid runway, allocation, and lowest cash year to flag plans that look rich on paper but are fragile to a single bad year.</li>
+            <li><strong>Rough income estimate.</strong> A back-of-envelope MAGI figure to flag possible ACA subsidy issues during pre-Medicare years. Not a substitute for tax software.</li>
+          </ul>
+
+          <h3>What this planner does not do</h3>
+          <ul>
+            <li>Federal brackets, state tax, IRMAA, RMDs, NIIT, AMT, capital gains brackets, or the standard deduction.</li>
+            <li>Exact ACA subsidy math, IRA aggregation rules, Roth IRA five-year clock interactions, or the specific SEPP payment-method calculations (RMD method, amortization, annuitization).</li>
+            <li>Plan document specifics — your 401(k) may not allow partial distributions, may not allow Rule of 55 separations, or may have unique vesting.</li>
+            <li>Pension survivorship elections, COLA assumptions, or buyout offers.</li>
+            <li>Behavioral risk — the temptation to sell in a downturn is the single largest threat to any plan, and no calculator can model it.</li>
+          </ul>
+
+          <h3>How to use it well</h3>
+          <p>Run the base case. Then run the same plan with the crash-in-year-1 pattern. If the second run shows a shortfall or pushes liquid runway below two years, the plan is fragile regardless of what the long-term numbers say. Bridge years punish bad sequences far more than the rest of retirement does.</p>
+          <p>Then run again with retire age 55 and Rule of 55 strategy. Compare the lowest-liquid figures across scenarios. The right early retirement age is rarely the youngest one your spreadsheet allows — it is the one where the bridge stays resilient under stress.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <span class="brand">RupeeStories</span> · Bridge Planner · Educational prototype, not financial or tax advice.
+</footer>
+</main>
+
+<script>
+let lastRows=[]; let lastRoth=[]; let lastPlan=null;
+
+function val(id){return Number(document.getElementById(id).value||0)}
+function checked(id){return document.getElementById(id).checked}
+function money(n){if(!isFinite(n))return'$0';const s=n<0?'-':'';n=Math.abs(n);if(n>=1000000)return s+'$'+(n/1000000).toFixed(2)+'M';if(n>=10000)return s+'$'+(n/1000).toFixed(0)+'K';return s+'$'+Math.round(n).toLocaleString()}
+function moneyExact(n){if(!isFinite(n))return'$0';return (n<0?'-':'')+'$'+Math.round(Math.abs(n)).toLocaleString()}
+function pct(n){return(n*100).toFixed(0)+'%'}
+
+function cloneInputs(){return{
+  age:val('age'),retireAge:val('retireAge'),spend:val('spend'),inflation:val('inflation')/100,
+  healthcareBridge:val('healthcareBridge'),healthcareLater:val('healthcareLater'),healthInflation:val('healthInflation')/100,
+  cash:val('cash'),taxableBasis:val('taxableBasis'),taxableGains:val('taxableGains'),college:val('college'),include529:checked('include529'),
+  current401k:val('current401k'),old401k:val('old401k'),tradIRA:val('tradIRA'),hsa:val('hsa'),rothBasis:val('rothBasis'),rothGrowth:val('rothGrowth'),
+  strategy:document.getElementById('strategy').value,taxSource:document.getElementById('taxSource').value,
+  seppSource:document.getElementById('seppSource').value,convSource:document.getElementById('convSource').value,
+  seppGross:val('seppGross'),seppTaxRate:val('seppTaxRate')/100,
+  convGross:val('convGross'),convTaxRate:val('convTaxRate')/100,convStart:val('convStart'),convEnd:val('convEnd'),
+  hsaQualified:val('hsaQualified'),capGainsRate:val('capGainsRate')/100,
+  husPensionAge:val('husPensionAge'),husPension:val('husPension'),wifePensionAge:val('wifePensionAge'),wifePension:val('wifePension'),
+  ssAge:val('ssAge'),ssAnnual:val('ssAnnual'),
+  bondReturn:val('bondReturn')/100,stockReturn:val('stockReturn')/100,stockAlloc:val('stockAlloc')/100,
+  crashPattern:document.getElementById('crashPattern').value,crashPct:val('crashPct')/100,inflationSpike:val('inflationSpike')
+}}
+
+function validate(p){
+  const out=[];
+  if(p.retireAge<p.age)out.push(['Input error','Retirement age is below current age.']);
+  if(p.convEnd<p.convStart)out.push(['Input error','Conversion end age is before conversion start age.']);
+  ['cash','taxableBasis','taxableGains','college','current401k','old401k','tradIRA','hsa','rothBasis','rothGrowth'].forEach(k=>{
+    if(p[k]<0)out.push(['Input error',k+' cannot be negative.'])
+  });
+  if(p.strategy==='rule55'&&p.retireAge<55)out.push(['Rule of 55','Selected before age 55. Some plans qualify in the calendar year of age 55, but this model uses an age-55 cutoff. Old 401(k)s and IRAs cannot use Rule of 55 regardless.']);
+  return out;
+}
+
+function stockR(p,y){
+  let r=p.stockReturn;
+  if(p.crashPattern==='year1'&&y===0)r-=p.crashPct;
+  if(p.crashPattern==='year3'&&y===2)r-=p.crashPct;
+  if(p.crashPattern==='threeYear'&&y>=0&&y<3)r-=p.crashPct/3;
+  if(p.crashPattern==='lostDecade'&&y<10)r=Math.min(r,.01);
+  return r;
+}
+function wr(p,y){return p.stockAlloc*stockR(p,y)+(1-p.stockAlloc)*p.bondReturn}
+function seppEndAge(age){return Math.max(59.5,age+5)}
+
+function drawTrad(amount,state,order){
+  let left=amount,draw=0;
+  order.forEach(k=>{
+    const d=Math.min(state[k],left);
+    state[k]-=d;
+    draw+=d;
+    left-=d;
+  });
+  return draw;
+}
+
+// IRS Uniform Lifetime Table divisors (post-SECURE 2.0). 73-90 covered; >90 falls to 12.2.
+const RMD_DIVISOR={73:26.5,74:25.5,75:24.6,76:23.7,77:22.9,78:22.0,79:21.1,80:20.2,81:19.4,82:18.5,83:17.7,84:16.8,85:16.0,86:15.2,87:14.4,88:13.7,89:12.9,90:12.2};
+
+function simulate(input,override={}){
+  const p={...input,...override};
+  let state={cash:p.cash,taxableBasis:p.taxableBasis,taxableGains:p.taxableGains,current401k:p.current401k,old401k:p.old401k,tradIRA:p.tradIRA,hsa:p.hsa,rothBasis:p.rothBasis,rothGrowth:p.rothGrowth,college:p.college};
+  // Vintages track conversion principal only. Growth on the converted dollars flows through state.rothGrowth.
+  let vintages=[];
+  let rows=[],rothRows=[],totalTaxes=0,totalShortfall=0,lowestLiquid=state.cash+state.taxableBasis+state.taxableGains,totalGapBefore70=0,firstFailureAge=null,seppBroken=false,seppBrokenAge=null;
+
+  // Conversion source map
+  const convOrderMap={ira:['tradIRA'],iraOld:['tradIRA','old401k'],all:['tradIRA','old401k','current401k']};
+
+  for(let age=p.retireAge;age<=90;age++){
+    const y=age-p.retireAge;
+    const inf=(p.inflationSpike==1&&y<5)?p.inflation+.02:p.inflation;
+    const factor=Math.pow(1+inf,y);
+    const hFactor=Math.pow(1+p.healthInflation,y);
+    const baseSpend=p.spend*factor;
+    const healthcare=(age<65?p.healthcareBridge:p.healthcareLater)*hFactor;
+    const spending=baseSpend+healthcare;
+    const pension=(age>=p.husPensionAge?p.husPension*factor:0)+(age>=p.wifePensionAge?p.wifePension*factor:0);
+    const ss=age>=p.ssAge?p.ssAnnual*factor:0;
+
+    let seppGross=0,seppTax=0,seppNet=0,convGross=0,convTax=0,convPenalty=0;
+    let fromCurrent401k=0,fromOld401k=0,fromIRA=0,rmdGross=0,rmdNet=0,rmdTax=0;
+    const useSepp=p.strategy==='sepp'&&age<seppEndAge(p.retireAge);
+    const useRule55=p.strategy==='rule55'&&p.retireAge>=55&&age>=55;
+
+    // SEPP: single bucket only. If that bucket runs dry mid-schedule, plan breaks.
+    if(useSepp){
+      const bucket=p.seppSource;
+      seppGross=Math.min(p.seppGross,state[bucket]);
+      state[bucket]-=seppGross;
+      seppTax=seppGross*p.seppTaxRate;
+      seppNet=seppGross-seppTax;
+      totalTaxes+=seppTax;
+      if(seppGross<p.seppGross&&!seppBroken){seppBroken=true;seppBrokenAge=age;}
+    }
+
+    // Roth conversions: use selected source order
+    if(age>=p.convStart&&age<=p.convEnd&&p.strategy!=='rule55'){
+      convGross=drawTrad(p.convGross,state,convOrderMap[p.convSource]||convOrderMap.ira);
+      convTax=convGross*p.convTaxRate;
+      if(p.taxSource==='withheld'){
+        convPenalty=age<59.5?convTax*.10:0;
+        vintages.push({created:age,unlockAge:age+5,principal:Math.max(0,convGross-convTax)});
+      }else{
+        vintages.push({created:age,unlockAge:age+5,principal:convGross});
+      }
+      totalTaxes+=convTax+convPenalty;
+    }
+
+    // RMDs at 73+: forced draw from traditional buckets proportionally
+    if(age>=73){
+      const divisor=RMD_DIVISOR[age]||12.2;
+      const tradTotal=state.tradIRA+state.old401k+state.current401k;
+      rmdGross=tradTotal/divisor;
+      // Withdraw proportionally
+      if(tradTotal>0){
+        const wIRA=rmdGross*(state.tradIRA/tradTotal);
+        const wOld=rmdGross*(state.old401k/tradTotal);
+        const wCur=rmdGross*(state.current401k/tradTotal);
+        state.tradIRA-=wIRA;state.old401k-=wOld;state.current401k-=wCur;
+        fromIRA+=wIRA;fromOld401k+=wOld;fromCurrent401k+=wCur;
+      }
+      rmdTax=rmdGross*p.seppTaxRate; // ordinary income, using SEPP tax rate as proxy
+      rmdNet=rmdGross-rmdTax;
+      totalTaxes+=rmdTax;
+    }
+
+    let need=Math.max(0,spending-pension-ss-seppNet-rmdNet);
+    // RMD excess goes to taxable basis (reinvested after tax)
+    if(rmdNet>spending-pension-ss-seppNet){
+      const excess=rmdNet-Math.max(0,spending-pension-ss-seppNet);
+      state.taxableBasis+=excess;
+    }
+    if(age<70)totalGapBefore70+=need;
+
+    if(p.taxSource==='taxable'&&convTax>0){
+      const taxFromCash=Math.min(state.cash,convTax);
+      state.cash-=taxFromCash;
+      need+=Math.max(0,convTax-taxFromCash);
+    }
+
+    let fromCash=Math.min(state.cash,need);state.cash-=fromCash;need-=fromCash;
+    let fromReserves=Math.min(state.taxableBasis,need);state.taxableBasis-=fromReserves;need-=fromReserves;
+
+    let fromTaxableGainsGross=0,capTax=0;
+    if(need>0&&state.taxableGains>0){
+      fromTaxableGainsGross=Math.min(state.taxableGains,need/Math.max(0.0001,(1-p.capGainsRate)));
+      capTax=fromTaxableGainsGross*p.capGainsRate;
+      state.taxableGains-=fromTaxableGainsGross;
+      need-=Math.max(0,fromTaxableGainsGross-capTax);
+      totalTaxes+=capTax;
+    }
+
+    // HSA: pre-65 only qualified expenses; 65+ usable for anything (ordinary income, no penalty)
+    const hsaCap=age>=65?state.hsa:Math.min(state.hsa,p.hsaQualified*hFactor);
+    let fromHsa=Math.min(hsaCap,need);state.hsa-=fromHsa;need-=fromHsa;
+
+    let fromRothBasis=Math.min(state.rothBasis,need);state.rothBasis-=fromRothBasis;need-=fromRothBasis;
+
+    let fromRothConv=0;
+    // FIFO ordering preserved by push order
+    vintages.filter(v=>v.unlockAge<=age).forEach(v=>{
+      if(need<=0)return;
+      const d=Math.min(v.principal,need);
+      v.principal-=d;fromRothConv+=d;need-=d;
+    });
+
+    let fromRothEarnings=0;
+    if(need>0&&age>=59.5){
+      fromRothEarnings=Math.min(state.rothGrowth,need);
+      state.rothGrowth-=fromRothEarnings;
+      need-=fromRothEarnings;
+    }
+
+    if(need>0&&useRule55){
+      const r55Draw=Math.min(state.current401k,need);
+      state.current401k-=r55Draw;
+      fromCurrent401k+=r55Draw;
+      need-=r55Draw;
+    }
+
+    if(need>0&&age>=59.5){
+      const iraDraw=Math.min(state.tradIRA,need);state.tradIRA-=iraDraw;fromIRA+=iraDraw;need-=iraDraw;
+      const oldDraw=Math.min(state.old401k,need);state.old401k-=oldDraw;fromOld401k+=oldDraw;need-=oldDraw;
+      const curDraw=Math.min(state.current401k,need);state.current401k-=curDraw;fromCurrent401k+=curDraw;need-=curDraw;
+    }
+
+    let fromCollege=0;
+    if(need>0&&p.include529){
+      fromCollege=Math.min(state.college,need);
+      state.college-=fromCollege;need-=fromCollege;
+    }
+
+    let shortfall=need;
+    if(shortfall>0&&firstFailureAge===null)firstFailureAge=age;
+    totalShortfall+=shortfall;
+
+    const liquid=state.cash+state.taxableBasis+state.taxableGains;
+    lowestLiquid=Math.min(lowestLiquid,liquid);
+    const runway=spending>0?liquid/spending:0;
+
+    const r=wr(p,y);
+    state.cash*=1+p.bondReturn;
+    state.taxableBasis*=1+p.bondReturn;
+    state.taxableGains*=1+r;
+    state.current401k*=1+r;
+    state.old401k*=1+r;
+    state.tradIRA*=1+r;
+    state.hsa*=1+p.bondReturn;
+    state.college*=1+p.bondReturn;
+    state.rothBasis*=1+r;
+    state.rothGrowth*=1+r;
+    vintages.forEach(v=>{v.principal*=1+r});
+
+    const roughIncome=seppGross+convGross+rmdGross+pension+ss*.85+fromTaxableGainsGross+fromIRA+fromOld401k+(age<59.5?0:fromCurrent401k);
+
+    rows.push({age,spending,baseSpend,healthcare,pension,ss,roughIncome,seppNet,convGross,rmdGross,convTax,
+      fromCash,fromReserves,fromTaxableGainsGross,fromHsa,fromRothBasis,fromRothConv,fromRothEarnings,
+      fromCurrent401k,fromOld401k,fromIRA,fromCollege,shortfall,liquidRunway:runway,liquid,
+      current401k:state.current401k,old401k:state.old401k,tradIRA:state.tradIRA,
+      rothAccessible:state.rothBasis+vintages.filter(v=>v.unlockAge<=age).reduce((s,v)=>s+v.principal,0)+(age>=59.5?state.rothGrowth:0),
+      rothRestricted:vintages.filter(v=>v.unlockAge>age).reduce((s,v)=>s+v.principal,0)+(age<59.5?state.rothGrowth:0)});
+
+    rothRows.push({age,
+      contributions:state.rothBasis,
+      unlockedConversions:vintages.filter(v=>v.unlockAge<=age).reduce((s,v)=>s+v.principal,0),
+      lockedConversions:vintages.filter(v=>v.unlockAge>age).reduce((s,v)=>s+v.principal,0),
+      earnings:state.rothGrowth,
+      accessible:state.rothBasis+vintages.filter(v=>v.unlockAge<=age).reduce((s,v)=>s+v.principal,0)+(age>=59.5?state.rothGrowth:0),
+      restricted:vintages.filter(v=>v.unlockAge>age).reduce((s,v)=>s+v.principal,0)+(age<59.5?state.rothGrowth:0)});
+  }
+  const endingAssets=state.cash+state.taxableBasis+state.taxableGains+state.current401k+state.old401k+state.tradIRA+state.hsa+state.rothBasis+state.rothGrowth+state.college+vintages.reduce((s,v)=>s+v.principal,0);
+  return{rows,rothRows,endingAssets,totalShortfall,totalTaxes,lowestLiquid,totalGapBefore70,firstFailureAge,seppBroken,seppBrokenAge};
+}
+
+function stress(p,r){
+  const liquidYears=(p.cash+p.taxableBasis+p.taxableGains)/Math.max(1,p.spend+p.healthcareBridge);
+  if(r.totalShortfall>0||liquidYears<2||p.stockAlloc>.8||r.lowestLiquid<p.spend*.5)return['High','danger'];
+  if(liquidYears<4||p.stockAlloc>.65||r.lowestLiquid<p.spend*1.5)return['Medium','warn'];
+  return['Low','ok'];
+}
+
+function renderHeadline(p,r){
+  const [stressLabel,stressColor]=stress(p,r);
+  const banner=document.getElementById('headlineBanner');
+  const title=document.getElementById('headlineTitle');
+  const pitch=document.getElementById('headlinePitch');
+  const verdict=document.getElementById('headlineVerdict');
+
+  if(r.seppBroken){
+    title.textContent='72(t) schedule breaks at age '+r.seppBrokenAge;
+    pitch.innerHTML='Selected SEPP source bucket ran dry mid-schedule. In real life this voids the SEPP and triggers retroactive 10% penalties on every prior distribution. Lower the annual draw or pick a different source bucket.';
+    verdict.classList.add('bad');
+    verdict.innerHTML='<span class="lbl">Verdict</span>SEPP breaks';
+  }else if(r.totalShortfall>0){
+    title.textContent='Bridge breaks at age '+r.firstFailureAge;
+    pitch.innerHTML='Total shortfall of <strong style="color:#f5b7b1">'+moneyExact(r.totalShortfall)+'</strong> across the plan. Re-examine spending, retire age, conversion ladder, or growth assumptions before locking this in.';
+    verdict.classList.add('bad');
+    verdict.innerHTML='<span class="lbl">Verdict</span>Plan fails';
+  }else if(stressLabel==='High'){
+    title.textContent='Base case funded, but stress signal high';
+    pitch.innerHTML='Plan covers spending under base assumptions but is fragile. Low liquid runway or heavy stock allocation means a bad sequence could break it.';
+    verdict.classList.remove('bad');
+    verdict.innerHTML='<span class="lbl">Verdict</span>Fragile';
+  }else if(stressLabel==='Medium'){
+    title.textContent='Plan works under base case';
+    pitch.innerHTML='Funded with moderate stress. Lowest liquid year was '+moneyExact(r.lowestLiquid)+'. Run the crash scenarios on the right to confirm resilience.';
+    verdict.classList.remove('bad');
+    verdict.innerHTML='<span class="lbl">Verdict</span>Workable';
+  }else{
+    title.textContent='Plan funded with resilience';
+    pitch.innerHTML='Comfortable liquid runway, conservative allocation, plan endures bad timing well. Final assets at age 90: '+moneyExact(r.endingAssets)+'.';
+    verdict.classList.remove('bad');
+    verdict.innerHTML='<span class="lbl">Verdict</span>Resilient';
+  }
+}
+
+function renderAccess(p,r){
+  // Snapshot at retirement age (year 0 of the plan)
+  const firstYearSpend=p.spend+p.healthcareBridge;
+  // Penalty-free buckets at start
+  const penaltyFree=p.cash+p.taxableBasis+p.taxableGains*(1-p.capGainsRate)+p.rothBasis;
+  // HSA usable for qualified medical only, but it counts as penalty-free for that spending slice
+  const hsaPenaltyFree=Math.min(p.hsa,p.hsaQualified*Math.min(15,Math.max(0,65-p.retireAge)));
+  const totalPenaltyFree=penaltyFree+hsaPenaltyFree;
+  // Within-5-year unlocks: planned conversions in the first 5 years become accessible at year+5
+  const convYears=Math.max(0,Math.min(5,p.convEnd-p.convStart+1));
+  const within5=totalPenaltyFree+(p.convGross*convYears);
+  // Locked = traditional pre-tax pools (10% penalty pre-59.5) + Roth earnings (penalty pre-59.5)
+  const locked=p.tradIRA+p.old401k+p.current401k+p.rothGrowth+(p.hsa-hsaPenaltyFree);
+  // 529 is earmarked unless toggled
+  const earmarked=p.include529?0:p.college;
+  // Total net worth
+  const netWorth=p.cash+p.taxableBasis+p.taxableGains+p.tradIRA+p.old401k+p.current401k+p.hsa+p.rothBasis+p.rothGrowth+p.college;
+  // Bridge years covered safely without touching penalty accounts
+  const bridgeYears=firstYearSpend>0?totalPenaltyFree/firstYearSpend:0;
+  // Bridge required: years from retire to 59.5
+  const bridgeNeeded=Math.max(0,59.5-p.retireAge);
+
+  const ratio=netWorth>0?totalPenaltyFree/netWorth:0;
+  let frame='';
+  if(bridgeYears>=bridgeNeeded){
+    frame=`<strong>Penalty-free coverage clears the bridge.</strong> Roughly <strong>${(totalPenaltyFree/Math.max(1,netWorth)*100).toFixed(0)}%</strong> of net worth sits in accounts you can reach without a 10% penalty. ${bridgeYears.toFixed(1)} years of spending sits there — enough to cover the ${bridgeNeeded.toFixed(1)} years until 59½ on its own.`;
+  }else if(bridgeYears>=bridgeNeeded*0.6){
+    frame=`<strong>Bridge depends on the ladder.</strong> Only <strong>${(totalPenaltyFree/Math.max(1,netWorth)*100).toFixed(0)}%</strong> of net worth is penalty-free. That covers ${bridgeYears.toFixed(1)} of the ${bridgeNeeded.toFixed(1)} bridge years on its own — the rest requires the Roth conversion ladder to season on schedule.`;
+  }else{
+    frame=`<strong>Most of the money is locked.</strong> Only <strong>${(totalPenaltyFree/Math.max(1,netWorth)*100).toFixed(0)}%</strong> of net worth is penalty-free. Penalty-free coverage runs ${bridgeYears.toFixed(1)} of the ${bridgeNeeded.toFixed(1)} bridge years — high reliance on SEPP or Roth ladder mechanics, both of which can break under stress.`;
+  }
+  if(earmarked>0)frame+=` 529 of ${moneyExact(earmarked)} is earmarked for education and excluded from accessible buckets above.`;
+
+  document.getElementById('accessGrid').innerHTML=`
+    <div class="accessTile"><div class="tLabel">Total net worth</div><div class="tValue">${moneyExact(netWorth)}</div><div class="tHint">All buckets, today</div></div>
+    <div class="accessTile bridge"><div class="tLabel">Penalty-free before 59½</div><div class="tValue">${moneyExact(totalPenaltyFree)}</div><div class="tHint">Cash, bonds, taxable, Roth basis, HSA qualified</div></div>
+    <div class="accessTile"><div class="tLabel">Accessible within 5 years</div><div class="tValue">${moneyExact(within5)}</div><div class="tHint">+ planned Roth conversion ladder</div></div>
+    <div class="accessTile locked"><div class="tLabel">Locked retirement assets</div><div class="tValue">${moneyExact(locked)}</div><div class="tHint">Traditional + Roth earnings, 10% penalty pre-59½</div></div>
+    <div class="accessTile bridge"><div class="tLabel">Bridge years covered safely</div><div class="tValue">${bridgeYears.toFixed(1)} yrs</div><div class="tHint">vs ${bridgeNeeded.toFixed(1)} yrs of bridge needed</div></div>
+  `;
+  document.getElementById('accessFoot').innerHTML=frame;
+}
+
+function renderSummary(p,r){
+  const spend70=(p.spend+p.healthcareLater)*Math.pow(1+p.inflation,Math.max(0,70-p.retireAge));
+  const guaranteed=p.husPension+p.wifePension+p.ssAnnual;
+  const coverage=guaranteed/Math.max(1,spend70);
+  const [stressLabel,stressColor]=stress(p,r);
+  document.getElementById('summary').innerHTML=`
+    <div class="metric ${stressColor}"><div class="label">Bridge stress</div><div class="value ${stressColor}">${stressLabel}</div><div class="hint">Composite of runway, allocation, lowest cash</div></div>
+    <div class="metric ${r.totalGapBefore70>0?'blue':'ok'}"><div class="label">Spending gap to age 70</div><div class="value blue">${moneyExact(r.totalGapBefore70)}</div><div class="hint">Net of pensions, SS, 72(t)</div></div>
+    <div class="metric warn"><div class="label">Taxes modeled</div><div class="value warn">${moneyExact(r.totalTaxes)}</div><div class="hint">Lifetime, retirement onward</div></div>
+    <div class="metric ${r.endingAssets>0?'ok':'danger'}"><div class="label">Assets at 90</div><div class="value ${r.endingAssets>0?'ok':'danger'}">${moneyExact(r.endingAssets)}</div><div class="hint">All buckets combined</div></div>
+    <div class="metric ok"><div class="label">Guaranteed income at 70</div><div class="value navy">${pct(coverage)}</div><div class="hint">Coverage of inflated spending</div></div>
+    <div class="metric ${r.lowestLiquid<p.spend?'danger':'ok'}"><div class="label">Lowest liquid year</div><div class="value ${r.lowestLiquid<p.spend?'danger':'ok'}">${moneyExact(r.lowestLiquid)}</div><div class="hint">Floor across all years</div></div>
+  `;
+}
+
+function renderPlan(r){
+  lastRows=r.rows;
+  const h=['Age','Spend (incl. HC)','Pension','SS','72(t) net','Roth conv.','RMD','Cash','Reserves','Tax gains','HSA','Roth basis','Roth conv','Roth earn','Cur 401k','Old 401k','IRA','529','Gap','Runway (yrs)','Liquid'];
+  const b=r.rows.map(x=>{
+    const cls=x.shortfall>0?'shortfall':(x.age===65?'medicare':(x.age===70?'ssaccess':((x.age>=50&&x.age<=59)?'bridge':'')));
+    return `<tr class="${cls}"><td>${x.age}</td><td>${money(x.spending)}</td><td>${money(x.pension)}</td><td>${money(x.ss)}</td><td>${money(x.seppNet)}</td><td>${money(x.convGross)}</td><td>${money(x.rmdGross)}</td><td>${money(x.fromCash)}</td><td>${money(x.fromReserves)}</td><td>${money(x.fromTaxableGainsGross)}</td><td>${money(x.fromHsa)}</td><td>${money(x.fromRothBasis)}</td><td>${money(x.fromRothConv)}</td><td>${money(x.fromRothEarnings)}</td><td>${money(x.fromCurrent401k)}</td><td>${money(x.fromOld401k)}</td><td>${money(x.fromIRA)}</td><td>${money(x.fromCollege)}</td><td>${x.shortfall>0?'<span class="pill danger">'+money(x.shortfall)+'</span>':'<span class="pill ok">$0</span>'}</td><td class="num">${x.liquidRunway.toFixed(1)}</td><td>${money(x.liquid)}</td></tr>`;
+  }).join('');
+  document.getElementById('planTable').innerHTML='<thead><tr>'+h.map(x=>`<th>${x}</th>`).join('')+'</tr></thead><tbody>'+b+'</tbody>';
+}
+
+function renderRoth(r){
+  lastRoth=r.rothRows;
+  const b=r.rothRows.map(x=>`<tr><td>${x.age}</td><td>${money(x.contributions)}</td><td>${money(x.unlockedConversions)}</td><td>${money(x.lockedConversions)}</td><td>${money(x.earnings)}</td><td><span class="pill ok">${money(x.accessible)}</span></td><td><span class="pill warn">${money(x.restricted)}</span></td></tr>`).join('');
+  document.getElementById('rothTable').innerHTML='<thead><tr><th>Age</th><th>Contributions</th><th>Unlocked conversions</th><th>Locked conversions</th><th>Earnings</th><th>Accessible</th><th>Restricted</th></tr></thead><tbody>'+b+'</tbody>';
+}
+
+function renderPhases(p){
+  const phases=[
+    ['Bridge Phase 1',`${p.retireAge}–${Math.min(55,p.ssAge)}`,p.strategy==='rule55'?'Taxable until current 401(k) access':'Taxable + 72(t)','Liquidity stress, sequence risk'],
+    ['Bridge Phase 2','55–59½',p.strategy==='rule55'?'Current 401(k) if eligible':'Roth ladder unlocks','Rule access, market timing'],
+    ['Transition Phase','60–70','Pension + portfolio','Inflation, healthcare to Medicare'],
+    ['Stable Phase','70+','Social Security + pension','Longevity, RMDs, IRMAA']
+  ];
+  document.getElementById('phaseTable').innerHTML='<thead><tr><th>Phase</th><th>Age</th><th>Primary income</th><th>Main risk</th></tr></thead><tbody>'+phases.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td><td>${x[3]}</td></tr>`).join('')+'</tbody>';
+}
+
+function renderTimeline(p){
+  const rows=[
+    [p.retireAge,'Retire. Bridge begins.'],
+    [`${p.retireAge}–${seppEndAge(p.retireAge)}`,p.strategy==='sepp'?`72(t) commitment, ends at ~${seppEndAge(p.retireAge)}`:'No SEPP modeled'],
+    [`${p.convStart}–${p.convEnd}`,'Roth conversion window'],
+    [Math.min(p.convStart,p.retireAge)+5,'First Roth conversion vintage unlocks'],
+    [55,p.strategy==='rule55'?'Rule of 55: current 401(k) accessible if eligible':'Rule of 55 not selected'],
+    [59.5,'Penalty-free access to most retirement accounts'],
+    [p.husPensionAge,'Spouse 1 pension starts'],
+    [p.wifePensionAge,'Spouse 2 pension starts'],
+    [65,'Medicare eligibility'],
+    [p.ssAge,'Social Security starts'],
+    [73,'Required minimum distributions begin']
+  ];
+  document.getElementById('timelineTable').innerHTML='<thead><tr><th>Age</th><th>Milestone</th></tr></thead><tbody>'+rows.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join('')+'</tbody>';
+}
+
+function renderCompare(p){
+  const scenarios=[
+    ['Base case',simulate(p)],
+    ['Crash year 1 + inflation',simulate({...p,crashPattern:'year1',inflationSpike:1})],
+    ['3-year bear market',simulate({...p,crashPattern:'threeYear'})],
+    ['Lost decade',simulate({...p,crashPattern:'lostDecade'})],
+    ['Lower returns (-3%)',simulate({...p,stockReturn:Math.max(0,p.stockReturn-.03)})],
+    ['Healthcare +50%',simulate({...p,healthcareBridge:p.healthcareBridge*1.5,healthcareLater:p.healthcareLater*1.5})],
+    ['Retire 1 yr later',simulate({...p,retireAge:p.retireAge+1})]
+  ];
+  document.getElementById('compareTable').innerHTML='<thead><tr><th>Scenario</th><th>First failure</th><th>Total shortfall</th><th>Taxes modeled</th><th>Lowest liquid</th><th>Assets at 90</th></tr></thead><tbody>'+scenarios.map(([n,r])=>{
+    const failPill=r.firstFailureAge?'<span class="pill danger">age '+r.firstFailureAge+'</span>':'<span class="pill ok">never</span>';
+    return `<tr><td>${n}</td><td>${failPill}</td><td>${money(r.totalShortfall)}</td><td>${money(r.totalTaxes)}</td><td>${money(r.lowestLiquid)}</td><td>${money(r.endingAssets)}</td></tr>`;
+  }).join('')+'</tbody>';
+}
+
+function renderWarnings(p,r){
+  let w=validate(p);
+  if(r.seppBroken)w.push(['SEPP schedule broke',`Selected 72(t) source ran out at age ${r.seppBrokenAge}. In real life, failing to take the full scheduled distribution would void the SEPP retroactively and assess 10% penalties on all prior SEPP distributions. Re-pick the source bucket or lower the annual amount.`]);
+  if(p.strategy==='sepp')w.push(['SEPP rule',`SEPP must continue at least five years or until age 59½, whichever is longer. This model uses end age ${seppEndAge(p.retireAge)} and a single source bucket (${p.seppSource==='tradIRA'?'Traditional IRA':'Old 401(k)'}). Modifying, stopping early, or running the bucket dry voids the schedule.`]);
+  if(p.strategy==='rule55')w.push(['Rule of 55','Applies only to the 401(k) of the employer you separate from at age 55 or later. Old 401(k)s, IRAs, and Roth IRAs do not qualify. Plan documents may also restrict partial withdrawals.']);
+  if(p.taxSource==='withheld'&&p.retireAge<59.5)w.push(['Conversion withholding','Withholding conversion taxes from the retirement account before 59½ may itself be a taxable distribution subject to the 10% penalty on the withheld amount.']);
+  if(p.convGross>0)w.push(['Roth ladder',`Each conversion has its own five-year clock. Conversion source set to ${p.convSource==='ira'?'IRA only':p.convSource==='iraOld'?'IRA + old 401(k)':'all traditional incl. current 401(k)'}. In-service 401(k) conversions are not always allowed by plan documents.`]);
+  const acaYears=r.rows.filter(x=>x.roughIncome>80000&&x.age<65);
+  if(acaYears.length)w.push(['ACA / MAGI',`Rough income exceeds $80K in ${acaYears.length} pre-Medicare years. ACA subsidy impact depends on household size, state, year, and actual MAGI. Treat the threshold here as directional, not authoritative.`]);
+  if(!p.include529&&p.college>0)w.push(['529 treatment','529 is earmarked for education and not counted as retirement spending unless opted in.']);
+  if(p.healthcareBridge<15000)w.push(['Healthcare underestimate','Pre-Medicare insurance for a family without subsidies frequently exceeds $20–30K/year. Confirm against a current marketplace quote.']);
+  if(p.stockAlloc>.7)w.push(['Allocation','Stock allocation above 70% raises sequence-of-returns risk in the bridge years materially.']);
+  if(p.retireAge<55)w.push(['Pre-55 retirement','No Rule-of-55 path available. Pre-59½ access depends entirely on SEPP, Roth ladder, or taxable spending — all three should be in the plan.']);
+  w.push(['Capital gains conservatism','Taxable-gains sales are modeled as 100% gain (worst case). Real lots are a blend of basis and gain, so actual net proceeds will typically be higher than shown.']);
+  w.push(['RMDs',`Modeled using the IRS Uniform Lifetime Table from age 73, taxed at the SEPP rate as a proxy. Real RMD tax depends on bracket, state, and IRMAA. Note also that traditional IRAs can be aggregated and the RMD pulled from any one IRA, but 401(k) RMDs must be calculated and taken plan by plan — the proportional draw shown here is directional, not literal.`]);
+  w.push(['Not modeled','Federal brackets, state tax, IRMAA, NIIT, AMT, pension survivorship, real capital gains brackets, college aid, ACA subsidy math, IRA aggregation rules, and plan-document specifics.']);
+  document.getElementById('warningTable').innerHTML='<thead><tr><th>Area</th><th>Warning</th></tr></thead><tbody>'+w.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join('')+'</tbody>';
+}
+
+function renderChart(r){
+  const svg=document.getElementById('chart');
+  const W=1000,H=280,pad={l:42,r:14,t:18,b:28};
+  const innerW=W-pad.l-pad.r, innerH=H-pad.t-pad.b;
+  const rows=r.rows;
+  const maxRunway=Math.max(8,...rows.map(x=>x.liquidRunway));
+  const bw=innerW/rows.length-2;
+  let html='';
+  // Y-axis grid
+  for(let i=0;i<=4;i++){
+    const v=maxRunway*i/4;
+    const y=pad.t+innerH-(v/maxRunway)*innerH;
+    html+=`<line x1="${pad.l}" y1="${y}" x2="${W-pad.r}" y2="${y}" stroke="#E5DFD2" stroke-width="1"/>`;
+    html+=`<text x="${pad.l-6}" y="${y+4}" font-size="10" fill="#8896AB" text-anchor="end">${v.toFixed(1)}</text>`;
+  }
+  // 2-year threshold line
+  const thresholdY=pad.t+innerH-(2/maxRunway)*innerH;
+  html+=`<line x1="${pad.l}" y1="${thresholdY}" x2="${W-pad.r}" y2="${thresholdY}" stroke="#C0392B" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>`;
+  // Bars
+  rows.forEach((x,i)=>{
+    const h=(x.liquidRunway/maxRunway)*innerH;
+    const xPos=pad.l+i*(innerW/rows.length)+1;
+    const yPos=pad.t+innerH-h;
+    const color=x.liquidRunway<2?'#C0392B':(x.liquidRunway<4?'#C9942A':'#C9942A');
+    html+=`<rect x="${xPos}" y="${yPos}" width="${bw}" height="${h}" fill="${color}" opacity="${x.liquidRunway<2?'0.85':'0.7'}"/>`;
+    // Age labels every 5 years
+    if(x.age%5===0){
+      html+=`<text x="${xPos+bw/2}" y="${H-10}" font-size="10" fill="#8896AB" text-anchor="middle">${x.age}</text>`;
+    }
+  });
+  // Milestone markers
+  [{age:59.5,label:'59½'},{age:65,label:'M'},{age:rows[0].age+0,label:''}].forEach(m=>{
+    const idx=rows.findIndex(x=>x.age>=m.age);
+    if(idx>=0){
+      const xPos=pad.l+idx*(innerW/rows.length);
+      html+=`<line x1="${xPos}" y1="${pad.t}" x2="${xPos}" y2="${pad.t+innerH}" stroke="#1B5FA5" stroke-width="1" stroke-dasharray="2,3" opacity="0.5"/>`;
+    }
+  });
+  svg.innerHTML=html;
+}
+
+function showTab(tab,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['plan','timeline','roth','compare','warnings','readme'].forEach(t=>document.getElementById(t+'Tab').style.display=tab===t?'block':'none');
+}
+
+function exportCSV(){
+  if(!lastRows.length)return;
+  const headers=Object.keys(lastRows[0]);
+  const csv=[headers.join(','),...lastRows.map(r=>headers.map(h=>Math.round((r[h]||0)*100)/100).join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='retirement_bridge_plan.csv';
+  a.click();
+}
+
+function runCalc(){
+  const p=cloneInputs();
+  const r=simulate(p);
+  lastPlan=r;
+  renderHeadline(p,r);
+  renderAccess(p,r);
+  renderSummary(p,r);
+  renderPlan(r);
+  renderRoth(r);
+  renderPhases(p);
+  renderTimeline(p);
+  renderCompare(p);
+  renderWarnings(p,r);
+  renderChart(r);
+}
+
+runCalc();
+</script>
+</body>
+</html>
