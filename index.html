@@ -158,6 +158,10 @@
   .accessTile{background:linear-gradient(180deg,var(--white) 0%,#fbf6ec 100%);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 14px 12px;position:relative;overflow:hidden}
   .accessTile.locked{background:linear-gradient(180deg,#fdf2f0 0%,#fbe5e0 100%);border-color:#f5b7b1}
   .accessTile.bridge{background:linear-gradient(180deg,#f0f9f3 0%,#dff0e7 100%);border-color:#a8d8b9}
+  .accessTile.bridgeYears{grid-column:span 2;border-width:2px}
+  .accessTile.bridgeYears.good{background:linear-gradient(180deg,#f0f9f3 0%,#dff0e7 100%);border-color:#2D9E6B}
+  .accessTile.bridgeYears.mid{background:linear-gradient(180deg,#fff8e8 0%,#fff1c4 100%);border-color:#E8B84B}
+  .accessTile.bridgeYears.bad{background:linear-gradient(180deg,#fdf2f0 0%,#fbe5e0 100%);border-color:#C0392B}
   .accessTile .tLabel{font-size:10.5px;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.08em;line-height:1.3;min-height:28px}
   .accessTile .tValue{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:600;color:var(--navy);margin-top:8px;letter-spacing:-.02em;line-height:1.05}
   .accessTile.locked .tValue{color:var(--red)}
@@ -173,9 +177,11 @@
   }
   @media(max-width:560px){
     .accessGrid{grid-template-columns:1fr}
+    .accessTile.bridgeYears{grid-column:auto}
   }
 
-  td.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum";min-width:48px}
+  td.num, .metric .value, .accessTile .tValue{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+  td.num{min-width:48px}
 
   /* RESPONSIVE */
   @media(max-width:980px){
@@ -207,7 +213,7 @@
       <span class="badge">No login</span>
       <span class="badge">No data collected</span>
       <span class="badge">Educational prototype</span>
-      <span class="badge">SEPP · Roth ladder · Rule of 55</span>
+      <span class="badge">US-only bridge planner</span><span class="badge">SEPP · Roth ladder · Rule of 55</span>
     </div>
   </div>
 </header>
@@ -372,7 +378,7 @@
     </div>
 
     <div class="note">
-      <strong>Model limitation:</strong> This is a planning illustration, not a rules engine. It does not validate exact SEPP payment methods, plan-specific Rule of 55 terms, ACA subsidy cliffs, IRMAA, state taxes, RMDs, pension survivorship, or exact Roth ordering rules. Confirm specifics with a CPA or fiduciary planner before acting.
+      <strong>Model limitation:</strong> This is a planning illustration, not a rules engine. It does not validate exact SEPP payment methods, plan-specific Rule of 55 terms, ACA subsidies, ACA cliff effects, IRMAA, state taxes, RMDs, pension survivorship, or exact Roth ordering rules. Roth conversions can spike MAGI and materially change ACA costs. Confirm specifics with a CPA or fiduciary planner before acting.
     </div>
 
     <div class="summary" id="summary"></div>
@@ -411,7 +417,7 @@
         <div class="readme">
           <h2>What this planner is built to show</h2>
           <p>Most retirement calculators ask one question: does the money last to age 95? They model net worth on the back of average returns, fixed withdrawal rates, and a single tax assumption, then return a green checkmark or a red warning.</p>
-          <p>This planner asks a different question. Can you actually <em>access</em> enough spendable cash during the bridge years between retirement and age 59½, when most of your money sits behind a 10% early-withdrawal penalty, when Social Security and Medicare are a decade away, and when one bad sequence of market years can permanently break the plan?</p>
+          <p>This planner asks a different question. Can you actually <em>access</em> enough spendable cash during the US bridge years between retirement and age 59½, when most of your money sits behind a 10% early-withdrawal penalty, when ACA and Medicare decisions matter, and when one bad sequence of market years can permanently break the plan?</p>
 
           <h3>What the model tracks separately</h3>
           <ul>
@@ -420,13 +426,13 @@
             <li><strong>Roth five-year vintages.</strong> Conversions create vintages tracked year by year. Each must season for five tax years before the principal can be withdrawn penalty-free.</li>
             <li><strong>Healthcare separately.</strong> Pre-Medicare insurance is modeled as a distinct line. For a family it can easily run $20–30K/year, and lumping it into general spending hides the real bridge stress.</li>
             <li><strong>Bridge stress signal.</strong> Looks at liquid runway, allocation, and lowest cash year to flag plans that look rich on paper but are fragile to a single bad year.</li>
-            <li><strong>Rough income estimate.</strong> A back-of-envelope MAGI figure to flag possible ACA subsidy issues during pre-Medicare years. Not a substitute for tax software.</li>
+            <li><strong>Rough MAGI signal.</strong> A back-of-envelope income signal to flag possible ACA subsidy issues during pre-Medicare years. ACA subsidies are not calculated here.</li>
           </ul>
 
           <h3>What this planner does not do</h3>
           <ul>
             <li>Federal brackets, state tax, IRMAA, RMDs, NIIT, AMT, capital gains brackets, or the standard deduction.</li>
-            <li>Exact ACA subsidy math, IRA aggregation rules, Roth IRA five-year clock interactions, or the specific SEPP payment-method calculations (RMD method, amortization, annuitization).</li>
+            <li>Exact ACA subsidy math, IRA aggregation rules, Roth IRA five-year clock interactions, or the specific SEPP payment-method calculations (RMD method, amortization, annuitization).</li><li>Return-to-India, RNOR, FX, or India tax-residency planning. Use the NRI Retirement Path Optimizer for cross-border paths.</li>
             <li>Plan document specifics — your 401(k) may not allow partial distributions, may not allow Rule of 55 separations, or may have unique vesting.</li>
             <li>Pension survivorship elections, COLA assumptions, or buyout offers.</li>
             <li>Behavioral risk — the temptation to sell in a downturn is the single largest threat to any plan, and no calculator can model it.</li>
@@ -726,44 +732,36 @@ function renderHeadline(p,r){
 }
 
 function renderAccess(p,r){
-  // Snapshot at retirement age (year 0 of the plan)
+  // Snapshot at retirement age (year 0 of the plan). US-only bridge framing.
   const firstYearSpend=p.spend+p.healthcareBridge;
-  // Penalty-free buckets at start
   const penaltyFree=p.cash+p.taxableBasis+p.taxableGains*(1-p.capGainsRate)+p.rothBasis;
-  // HSA usable for qualified medical only, but it counts as penalty-free for that spending slice
   const hsaPenaltyFree=Math.min(p.hsa,p.hsaQualified*Math.min(15,Math.max(0,65-p.retireAge)));
   const totalPenaltyFree=penaltyFree+hsaPenaltyFree;
-  // Within-5-year unlocks: planned conversions in the first 5 years become accessible at year+5
   const convYears=Math.max(0,Math.min(5,p.convEnd-p.convStart+1));
-  const within5=totalPenaltyFree+(p.convGross*convYears);
-  // Locked = traditional pre-tax pools (10% penalty pre-59.5) + Roth earnings (penalty pre-59.5)
+  const netConversionPerYear=p.convGross*(p.taxSource==='withheld'?(1-p.convTaxRate):1);
+  const within5=totalPenaltyFree+(netConversionPerYear*convYears);
   const locked=p.tradIRA+p.old401k+p.current401k+p.rothGrowth+(p.hsa-hsaPenaltyFree);
-  // 529 is earmarked unless toggled
   const earmarked=p.include529?0:p.college;
-  // Total net worth
   const netWorth=p.cash+p.taxableBasis+p.taxableGains+p.tradIRA+p.old401k+p.current401k+p.hsa+p.rothBasis+p.rothGrowth+p.college;
-  // Bridge years covered safely without touching penalty accounts
   const bridgeYears=firstYearSpend>0?totalPenaltyFree/firstYearSpend:0;
-  // Bridge required: years from retire to 59.5
   const bridgeNeeded=Math.max(0,59.5-p.retireAge);
-
-  const ratio=netWorth>0?totalPenaltyFree/netWorth:0;
+  const bridgeClass=bridgeYears>=bridgeNeeded?'good':(bridgeYears>=bridgeNeeded*0.6?'mid':'bad');
   let frame='';
   if(bridgeYears>=bridgeNeeded){
-    frame=`<strong>Penalty-free coverage clears the bridge.</strong> Roughly <strong>${(totalPenaltyFree/Math.max(1,netWorth)*100).toFixed(0)}%</strong> of net worth sits in accounts you can reach without a 10% penalty. ${bridgeYears.toFixed(1)} years of spending sits there — enough to cover the ${bridgeNeeded.toFixed(1)} years until 59½ on its own.`;
+    frame=`<strong>Penalty-free coverage clears the bridge.</strong> Roughly <strong>${(totalPenaltyFree/Math.max(1,netWorth)*100).toFixed(0)}%</strong> of net worth sits in accounts you can reach without a 10% penalty. ${bridgeYears.toFixed(1)} years of spending sits there, enough to cover the ${bridgeNeeded.toFixed(1)} years until 59½ on its own.`;
   }else if(bridgeYears>=bridgeNeeded*0.6){
-    frame=`<strong>Bridge depends on the ladder.</strong> Only <strong>${(totalPenaltyFree/Math.max(1,netWorth)*100).toFixed(0)}%</strong> of net worth is penalty-free. That covers ${bridgeYears.toFixed(1)} of the ${bridgeNeeded.toFixed(1)} bridge years on its own — the rest requires the Roth conversion ladder to season on schedule.`;
+    frame=`<strong>Bridge depends on the ladder.</strong> Only <strong>${(totalPenaltyFree/Math.max(1,netWorth)*100).toFixed(0)}%</strong> of net worth is penalty-free. That covers ${bridgeYears.toFixed(1)} of the ${bridgeNeeded.toFixed(1)} bridge years on its own. The rest depends on SEPP, Roth ladder timing, or taxable drawdown staying intact.`;
   }else{
-    frame=`<strong>Most of the money is locked.</strong> Only <strong>${(totalPenaltyFree/Math.max(1,netWorth)*100).toFixed(0)}%</strong> of net worth is penalty-free. Penalty-free coverage runs ${bridgeYears.toFixed(1)} of the ${bridgeNeeded.toFixed(1)} bridge years — high reliance on SEPP or Roth ladder mechanics, both of which can break under stress.`;
+    frame=`<strong>Most of the money is locked.</strong> Only <strong>${(totalPenaltyFree/Math.max(1,netWorth)*100).toFixed(0)}%</strong> of net worth is penalty-free. Penalty-free coverage runs ${bridgeYears.toFixed(1)} of the ${bridgeNeeded.toFixed(1)} bridge years. That is high reliance on SEPP or Roth ladder mechanics, both of which can break under stress.`;
   }
   if(earmarked>0)frame+=` 529 of ${moneyExact(earmarked)} is earmarked for education and excluded from accessible buckets above.`;
 
   document.getElementById('accessGrid').innerHTML=`
     <div class="accessTile"><div class="tLabel">Total net worth</div><div class="tValue">${moneyExact(netWorth)}</div><div class="tHint">All buckets, today</div></div>
     <div class="accessTile bridge"><div class="tLabel">Penalty-free before 59½</div><div class="tValue">${moneyExact(totalPenaltyFree)}</div><div class="tHint">Cash, bonds, taxable, Roth basis, HSA qualified</div></div>
-    <div class="accessTile"><div class="tLabel">Accessible within 5 years</div><div class="tValue">${moneyExact(within5)}</div><div class="tHint">+ planned Roth conversion ladder</div></div>
-    <div class="accessTile locked"><div class="tLabel">Locked retirement assets</div><div class="tValue">${moneyExact(locked)}</div><div class="tHint">Traditional + Roth earnings, 10% penalty pre-59½</div></div>
-    <div class="accessTile bridge"><div class="tLabel">Bridge years covered safely</div><div class="tValue">${bridgeYears.toFixed(1)} yrs</div><div class="tHint">vs ${bridgeNeeded.toFixed(1)} yrs of bridge needed</div></div>
+    <div class="accessTile"><div class="tLabel">Potentially accessible within 5 years</div><div class="tValue">${moneyExact(within5)}</div><div class="tHint">Penalty-free today + modeled Roth ladder principal</div></div>
+    <div class="accessTile locked"><div class="tLabel">Locked retirement assets</div><div class="tValue">${moneyExact(locked)}</div><div class="tHint">Traditional + Roth earnings, penalty risk pre-59½</div></div>
+    <div class="accessTile bridgeYears ${bridgeClass}"><div class="tLabel">Bridge years covered safely</div><div class="tValue">${bridgeYears.toFixed(1)} yrs</div><div class="tHint">vs ${bridgeNeeded.toFixed(1)} yrs needed before 59½</div></div>
   `;
   document.getElementById('accessFoot').innerHTML=frame;
 }
@@ -773,13 +771,16 @@ function renderSummary(p,r){
   const guaranteed=p.husPension+p.wifePension+p.ssAnnual;
   const coverage=guaranteed/Math.max(1,spend70);
   const [stressLabel,stressColor]=stress(p,r);
+  const dangerRows=r.rows.filter(x=>x.age<p.retireAge+10&&x.liquidRunway<2);
+  const dangerLabel=dangerRows.length?`Age ${dangerRows[0].age}`:'None';
+  const dangerClass=dangerRows.length?'danger':'ok';
   document.getElementById('summary').innerHTML=`
     <div class="metric ${stressColor}"><div class="label">Bridge stress</div><div class="value ${stressColor}">${stressLabel}</div><div class="hint">Composite of runway, allocation, lowest cash</div></div>
+    <div class="metric ${dangerClass}"><div class="label">Sequence danger zone</div><div class="value ${dangerClass}">${dangerLabel}</div><div class="hint">Runway below 2 yrs during first decade</div></div>
     <div class="metric ${r.totalGapBefore70>0?'blue':'ok'}"><div class="label">Spending gap to age 70</div><div class="value blue">${moneyExact(r.totalGapBefore70)}</div><div class="hint">Net of pensions, SS, 72(t)</div></div>
     <div class="metric warn"><div class="label">Taxes modeled</div><div class="value warn">${moneyExact(r.totalTaxes)}</div><div class="hint">Lifetime, retirement onward</div></div>
     <div class="metric ${r.endingAssets>0?'ok':'danger'}"><div class="label">Assets at 90</div><div class="value ${r.endingAssets>0?'ok':'danger'}">${moneyExact(r.endingAssets)}</div><div class="hint">All buckets combined</div></div>
     <div class="metric ok"><div class="label">Guaranteed income at 70</div><div class="value navy">${pct(coverage)}</div><div class="hint">Coverage of inflated spending</div></div>
-    <div class="metric ${r.lowestLiquid<p.spend?'danger':'ok'}"><div class="label">Lowest liquid year</div><div class="value ${r.lowestLiquid<p.spend?'danger':'ok'}">${moneyExact(r.lowestLiquid)}</div><div class="hint">Floor across all years</div></div>
   `;
 }
 
@@ -788,14 +789,14 @@ function renderPlan(r){
   const h=['Age','Spend (incl. HC)','Pension','SS','72(t) net','Roth conv.','RMD','Cash','Reserves','Tax gains','HSA','Roth basis','Roth conv','Roth earn','Cur 401k','Old 401k','IRA','529','Gap','Runway (yrs)','Liquid'];
   const b=r.rows.map(x=>{
     const cls=x.shortfall>0?'shortfall':(x.age===65?'medicare':(x.age===70?'ssaccess':((x.age>=50&&x.age<=59)?'bridge':'')));
-    return `<tr class="${cls}"><td>${x.age}</td><td>${money(x.spending)}</td><td>${money(x.pension)}</td><td>${money(x.ss)}</td><td>${money(x.seppNet)}</td><td>${money(x.convGross)}</td><td>${money(x.rmdGross)}</td><td>${money(x.fromCash)}</td><td>${money(x.fromReserves)}</td><td>${money(x.fromTaxableGainsGross)}</td><td>${money(x.fromHsa)}</td><td>${money(x.fromRothBasis)}</td><td>${money(x.fromRothConv)}</td><td>${money(x.fromRothEarnings)}</td><td>${money(x.fromCurrent401k)}</td><td>${money(x.fromOld401k)}</td><td>${money(x.fromIRA)}</td><td>${money(x.fromCollege)}</td><td>${x.shortfall>0?'<span class="pill danger">'+money(x.shortfall)+'</span>':'<span class="pill ok">$0</span>'}</td><td class="num">${x.liquidRunway.toFixed(1)}</td><td>${money(x.liquid)}</td></tr>`;
+    return `<tr class="${cls}"><td>${x.age}</td><td class="num">${money(x.spending)}</td><td class="num">${money(x.pension)}</td><td class="num">${money(x.ss)}</td><td class="num">${money(x.seppNet)}</td><td class="num">${money(x.convGross)}</td><td class="num">${money(x.rmdGross)}</td><td class="num">${money(x.fromCash)}</td><td class="num">${money(x.fromReserves)}</td><td class="num">${money(x.fromTaxableGainsGross)}</td><td class="num">${money(x.fromHsa)}</td><td class="num">${money(x.fromRothBasis)}</td><td class="num">${money(x.fromRothConv)}</td><td class="num">${money(x.fromRothEarnings)}</td><td class="num">${money(x.fromCurrent401k)}</td><td class="num">${money(x.fromOld401k)}</td><td class="num">${money(x.fromIRA)}</td><td class="num">${money(x.fromCollege)}</td><td class="num">${x.shortfall>0?'<span class="pill danger">'+money(x.shortfall)+'</span>':'<span class="pill ok">$0</span>'}</td><td class="num">${x.liquidRunway.toFixed(1)}</td><td class="num">${money(x.liquid)}</td></tr>`;
   }).join('');
   document.getElementById('planTable').innerHTML='<thead><tr>'+h.map(x=>`<th>${x}</th>`).join('')+'</tr></thead><tbody>'+b+'</tbody>';
 }
 
 function renderRoth(r){
   lastRoth=r.rothRows;
-  const b=r.rothRows.map(x=>`<tr><td>${x.age}</td><td>${money(x.contributions)}</td><td>${money(x.unlockedConversions)}</td><td>${money(x.lockedConversions)}</td><td>${money(x.earnings)}</td><td><span class="pill ok">${money(x.accessible)}</span></td><td><span class="pill warn">${money(x.restricted)}</span></td></tr>`).join('');
+  const b=r.rothRows.map(x=>`<tr><td>${x.age}</td><td class="num">${money(x.contributions)}</td><td class="num">${money(x.unlockedConversions)}</td><td class="num">${money(x.lockedConversions)}</td><td class="num">${money(x.earnings)}</td><td class="num"><span class="pill ok">${money(x.accessible)}</span></td><td class="num"><span class="pill warn">${money(x.restricted)}</span></td></tr>`).join('');
   document.getElementById('rothTable').innerHTML='<thead><tr><th>Age</th><th>Contributions</th><th>Unlocked conversions</th><th>Locked conversions</th><th>Earnings</th><th>Accessible</th><th>Restricted</th></tr></thead><tbody>'+b+'</tbody>';
 }
 
@@ -838,7 +839,7 @@ function renderCompare(p){
   ];
   document.getElementById('compareTable').innerHTML='<thead><tr><th>Scenario</th><th>First failure</th><th>Total shortfall</th><th>Taxes modeled</th><th>Lowest liquid</th><th>Assets at 90</th></tr></thead><tbody>'+scenarios.map(([n,r])=>{
     const failPill=r.firstFailureAge?'<span class="pill danger">age '+r.firstFailureAge+'</span>':'<span class="pill ok">never</span>';
-    return `<tr><td>${n}</td><td>${failPill}</td><td>${money(r.totalShortfall)}</td><td>${money(r.totalTaxes)}</td><td>${money(r.lowestLiquid)}</td><td>${money(r.endingAssets)}</td></tr>`;
+    return `<tr><td>${n}</td><td class="num">${failPill}</td><td class="num">${money(r.totalShortfall)}</td><td class="num">${money(r.totalTaxes)}</td><td class="num">${money(r.lowestLiquid)}</td><td class="num">${money(r.endingAssets)}</td></tr>`;
   }).join('')+'</tbody>';
 }
 
@@ -850,13 +851,16 @@ function renderWarnings(p,r){
   if(p.taxSource==='withheld'&&p.retireAge<59.5)w.push(['Conversion withholding','Withholding conversion taxes from the retirement account before 59½ may itself be a taxable distribution subject to the 10% penalty on the withheld amount.']);
   if(p.convGross>0)w.push(['Roth ladder',`Each conversion has its own five-year clock. Conversion source set to ${p.convSource==='ira'?'IRA only':p.convSource==='iraOld'?'IRA + old 401(k)':'all traditional incl. current 401(k)'}. In-service 401(k) conversions are not always allowed by plan documents.`]);
   const acaYears=r.rows.filter(x=>x.roughIncome>80000&&x.age<65);
-  if(acaYears.length)w.push(['ACA / MAGI',`Rough income exceeds $80K in ${acaYears.length} pre-Medicare years. ACA subsidy impact depends on household size, state, year, and actual MAGI. Treat the threshold here as directional, not authoritative.`]);
+  if(acaYears.length)w.push(['ACA / MAGI',`Rough income exceeds $80K in ${acaYears.length} pre-Medicare years. ACA subsidies are not modeled. Roth conversions, SEPP income, capital gains, and RMDs can materially change marketplace subsidies. Actual household MAGI depends on household size, state, year, and tax details.`]);
   if(!p.include529&&p.college>0)w.push(['529 treatment','529 is earmarked for education and not counted as retirement spending unless opted in.']);
-  if(p.healthcareBridge<15000)w.push(['Healthcare underestimate','Pre-Medicare insurance for a family without subsidies frequently exceeds $20–30K/year. Confirm against a current marketplace quote.']);
+  if(p.healthcareBridge<15000)w.push(['Healthcare underestimate','Pre-Medicare insurance for a family without subsidies can be expensive. Confirm against a current marketplace quote.']);
+  const preMedicareHC=r.rows.filter(x=>x.age<65).reduce((s,x)=>s+x.healthcare,0);
+  if(p.retireAge<60&&p.healthcareBridge>20000&&p.healthInflation>.04)w.push(['Healthcare bridge pressure',`Pre-Medicare healthcare totals roughly ${moneyExact(preMedicareHC)} before Medicare in this model. This can be the hidden cost that breaks an otherwise good bridge plan.`]);
   if(p.stockAlloc>.7)w.push(['Allocation','Stock allocation above 70% raises sequence-of-returns risk in the bridge years materially.']);
   if(p.retireAge<55)w.push(['Pre-55 retirement','No Rule-of-55 path available. Pre-59½ access depends entirely on SEPP, Roth ladder, or taxable spending — all three should be in the plan.']);
   w.push(['Capital gains conservatism','Taxable-gains sales are modeled as 100% gain (worst case). Real lots are a blend of basis and gain, so actual net proceeds will typically be higher than shown.']);
-  w.push(['RMDs',`Modeled using the IRS Uniform Lifetime Table from age 73, taxed at the SEPP rate as a proxy. Real RMD tax depends on bracket, state, and IRMAA. Note also that traditional IRAs can be aggregated and the RMD pulled from any one IRA, but 401(k) RMDs must be calculated and taken plan by plan — the proportional draw shown here is directional, not literal.`]);
+  w.push(['RMDs',`Modeled using the IRS Uniform Lifetime Table from age 73, taxed at the SEPP rate as a proxy. Real RMD tax depends on bracket, state, IRMAA, and aggregation rules.`]);
+  w.push(['US-only scope','This tool is intentionally US-specific. It does not model return-to-India, RNOR, FX, India taxation, or split-country retirement. Use the NRI Retirement Path Optimizer for that path.']);
   w.push(['Not modeled','Federal brackets, state tax, IRMAA, NIIT, AMT, pension survivorship, real capital gains brackets, college aid, ACA subsidy math, IRA aggregation rules, and plan-document specifics.']);
   document.getElementById('warningTable').innerHTML='<thead><tr><th>Area</th><th>Warning</th></tr></thead><tbody>'+w.map(x=>`<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join('')+'</tbody>';
 }
@@ -911,7 +915,8 @@ function showTab(tab,btn){
 function exportCSV(){
   if(!lastRows.length)return;
   const headers=Object.keys(lastRows[0]);
-  const csv=[headers.join(','),...lastRows.map(r=>headers.map(h=>Math.round((r[h]||0)*100)/100).join(','))].join('\n');
+  const csv=[headers.join(','),...lastRows.map(r=>headers.map(h=>Math.round((r[h]||0)*100)/100).join(','))].join('
+');
   const blob=new Blob([csv],{type:'text/csv'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
